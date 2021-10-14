@@ -1,17 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Card from "../UI/Card";
 import Button from "../UI/Button";
 import ErrorModal from "../UI/ErrorModal";
 import styles from "./AddUser.module.css";
+import Wrapper from "../helpers/Wrapper";
 
 const AddUser = (props) => {
-  const [enteredUsername, setentEredUsername] = useState("");
-  const [enteredAge, setEnteredAge] = useState("");
+  const nameInputRef = useRef();
+  const ageInputRef = useRef();
+  const enteredUsername = nameInputRef.current.value;
+  console.log(nameInputRef.current);
+  const enteredAge = ageInputRef.current.value;
   const [error, seterror] = useState();
   const addUserHandler = (event) => {
     event.preventDefault();
-    setEnteredAge("");
-    setentEredUsername("");
+
     if (enteredUsername.trim().length === 0 || enteredAge.trim().length === 0) {
       seterror({
         title: "Invalid Input",
@@ -28,21 +31,19 @@ const AddUser = (props) => {
       return;
     }
     props.onAddUsder(enteredUsername, enteredAge);
-  };
-  const usernameChangeHandler = (event) => {
-    setentEredUsername(event.target.value);
-  };
-
-  const ageChangeHandler = (event) => {
-    setEnteredAge(event.target.value);
+    //this is not that bad don't do it a lot it's quite ok for this use case
+    nameInputRef.current.value = "";
+    ageInputRef.current.value = "";
   };
 
   const errorHandler = () => {
     seterror(null);
   };
-
+  //this wrapper just returns the children of the body and is just a wrapper
+  //this wont be visible in the dom.
+  //after using refs we dont need state managment with all the name and age variables
   return (
-    <div>
+    <Wrapper>
       {error && (
         <ErrorModal
           title={error.title}
@@ -53,26 +54,24 @@ const AddUser = (props) => {
       <Card className={styles.input}>
         <form onSubmit={addUserHandler}>
           <label htmlFor="userName">Username</label>
-          <input
-            value={enteredUsername}
-            id="userName"
-            type="text"
-            onChange={usernameChangeHandler}
-          />
+          {/* these html elements are uncontrolled as the value in not controlled by react */}
+          <input id="userName" type="text" ref={nameInputRef} />
           <label htmlFor="age">Age (Years)</label>
-          <input
-            value={enteredAge}
-            id="age"
-            type="number"
-            onChange={ageChangeHandler}
-          />
+          {/* the state is not controlled by React unlike the value and onchange state approach
+          at that point we had controll over the internal state via React */}
+          <input id="age" type="number" ref={ageInputRef} />
           <Button type="submit" onClick={addUserHandler}>
             Add User
           </Button>
         </form>
       </Card>
-    </div>
+    </Wrapper>
   );
 };
 
 export default AddUser;
+
+//limitations of jsx
+// two jsx elements cant be returned with a return statement so no more than one root jsx element
+// it's like js because vanila js can only return one element via return statement.
+// temporary solution is wrapping inside a div.

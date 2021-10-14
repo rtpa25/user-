@@ -9,11 +9,13 @@ function App() {
       return [...prevUsersList, { name: uName, age: uAge, key: Math.random() }];
     });
   };
+  // React fragment is kinda of a built in wrapper
+  // Portals improve the dom and improve the accessibility and semantics
   return (
-    <div>
+    <React.Fragment>
       <AddUser onAddUsder={addUserHandler} />
       <UsersList users={usersList} />
-    </div>
+    </React.Fragment>
   );
 }
 
